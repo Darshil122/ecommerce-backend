@@ -1,9 +1,11 @@
 const fs = require("fs");
 const path = require("path");
+const cors = require("cors");
 
 const filePath = path.join(__dirname, "users.json");
 
 app.use(express.json());
+app.use(cors());
 
 app.post("/login", async (req, res) => {
   const { name, email, password, action } = req.body;
