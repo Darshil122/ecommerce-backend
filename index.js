@@ -11,7 +11,7 @@ app.use(express.json());
 // app.use(bodyparser.json());
 
 //Connect MongoDB
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect("mongodb://127.0.0.1:27017/e-commerce")
   .then(() => console.log("Mongo connected"))
   .catch((err) => console.log(err));
 
