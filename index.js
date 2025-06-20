@@ -33,7 +33,7 @@ app.post("/login", async (req, res) => {
   if (action === "Login") {
     // const user = await User.findOne({ email });
 
-    if (email === "darshil@gmail.com" || password === "123456") {
+    if (email === "jaydev@gmail.com" || password === "jk@123") {
       return res.status(200).json({ message: "Login successfully" });
     } else {
       return res.status(400).json({ message: "User not found" });
