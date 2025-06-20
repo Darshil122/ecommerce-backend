@@ -1,70 +1,48 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-// import { bodyparser } from "body-parser";
+const fs = require("fs");
+const path = require("path");
 
-const app = express();
+const filePath = path.join(__dirname, "users.json");
 
-//Middlewear
-app.use(cors());
 app.use(express.json());
-// app.use(bodyparser.json());
 
-//Connect MongoDB
-mongoose
-  .connect("mongodb://127.0.0.1:27017/e-commerce")
-  .then(() => console.log("Mongo connected"))
-  .catch((err) => console.log(err));
-
-//Create Schema
-const UserSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-});
-
-//Model
-const User = mongoose.model("user", UserSchema);
-
-//signup or login Route
 app.post("/login", async (req, res) => {
-  console.log("req body", req.body);
   const { name, email, password, action } = req.body;
+
+  // Read the users.json file
+  let users = [];
+  try {
+    const data = fs.readFileSync(filePath, "utf8");
+    users = JSON.parse(data);
+  } catch (err) {
+    return res.status(500).json({ message: "Failed to read user data" });
+  }
+
   if (action === "Sign Up") {
-    const existingUser = await User.findOne({ email });
+    const existingUser = users.find(user => user.email === email);
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
-    // const hashedPassword = await bcrypt.hash(password, 10);
-    await User.create({ name, email, password, action });
-    res.status(201).json({ message: "User created" });
-  }
-  if (action === "Login") {
-    // const user = await User.findOne({ email });
 
-    if (email === "darshil@gmail.com" || password === "123456") {
-      return res.status(200).json({ message: "Login successfully" });
-    } else {
-      return res.status(400).json({ message: "User not found" });
+    // Add new user
+    const newUser = { name, email, password };
+    users.push(newUser);
+
+    try {
+      fs.writeFileSync(filePath, JSON.stringify(users, null, 2));
+      return res.status(201).json({ message: "User created successfully" });
+    } catch (err) {
+      return res.status(500).json({ message: "Failed to save user" });
     }
-    // const isMatch = await compare();
-    // if (!password)
-    //   return res.status(400).json({ message: "Invalid password" });
   }
-});
 
-app.get("/", (req, res) => {
-  res.send("Hello World");
-});
+  if (action === "Login") {
+    const user = users.find(user => user.email === email && user.password === password);
+    if (user) {
+      return res.status(200).json({ message: "Login successful" });
+    } else {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+  }
 
-app.listen(5000, () => console.log("Server Start"));
+  return res.status(400).json({ message: "Invalid action" });
+});
