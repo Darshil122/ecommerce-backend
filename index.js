@@ -18,8 +18,8 @@ app.post("/login", async (req, res) => {
   }
 
   if (action === "Sign Up") {
-    const existingUser = users.find(user => user.email === email);
-    if (existingUser) {
+    const existUser = users.find(user => user.email === email);
+    if (existUser) {
       return res.status(400).json({ message: "User already exists" });
     }
 
