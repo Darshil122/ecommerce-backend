@@ -11,7 +11,7 @@ app.use(express.json());
 // app.use(bodyparser.json());
 
 //Connect MongoDB
-mongoose.connect("mongodb://127.0.0.1:27017/e-commerce")
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("Mongo connected"))
   .catch((err) => console.log(err));
 
@@ -59,9 +59,8 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// app.post("/login", async (req, res) =>{
-//     const {email, password} = req.body;
-
-// });
+app.get("/", (req, res) =>{
+  res.send("Hello World");
+})
 
 app.listen(5000, () => console.log("Server Start"));
